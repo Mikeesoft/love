@@ -61,6 +61,7 @@
             var correctPassword = "imane"; // 🔑 غير كلمة السر هنا
 
             if (password === correctPassword) {
+                localStorage.setItem("loggedIn", "true"); // 🟢 تسجيل الدخول
                 window.location.href = "index.html"; // 🔗 تحويل لصفحة الموقع الرئيسية
             } else {
                 document.getElementById("error").style.display = "block";
