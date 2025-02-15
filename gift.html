@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎁 مفاجأتكِ الخاصة 🎁</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+            background: linear-gradient(to right, #ff758c, #ff7eb3);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+        }
+        .content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            width: 100%;
+        }
+        .surprise-btn {
+            background: white;
+            color: #ff4081;
+            border: none;
+            padding: 15px 25px;
+            font-size: 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.2s ease-in-out;
+        }
+        .surprise-btn:hover {
+            transform: scale(1.1) rotate(3deg);
+        }
+        .hearts {
+            display: none;
+            font-size: 40px;
+            margin-top: 20px;
+            animation: floatHearts 2s infinite;
+        }
+        @keyframes floatHearts {
+            0% { transform: translateY(0); opacity: 1; }
+            100% { transform: translateY(-50px); opacity: 0; }
+        }
+        .membership-card {
+            display: none;
+            background: white;
+            color: #ff4081;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 15px rgba(0,0,0,0.2);
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            transition: opacity 1s ease-in-out;
+        }
+        .memories-btn {
+            margin-top: 20px;
+            padding: 12px 20px;
+            font-size: 18px;
+            color: white;
+            background: #ff4081;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.3s;
+            display: block;
+            text-align: center;
+            width: 80%;
+            max-width: 300px;
+        }
+        .memories-btn:hover {
+            background: #d6336c;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="content">
+        <h1>🎁 مفاجأتكِ الخاصة يا حبيبتي 🎁</h1>
+        <p>💖 عندك مفاجأة جميلة، اضغطي على الزر! 💖</p>
+
+        <button class="surprise-btn" id="fixedBtn" onclick="showSurprise()">اضغطي هنا للمفاجأة ❤️</button>
+
+        <div class="hearts" id="hearts">❤️💖💕😍</div>
+
+        <div class="membership-card" id="membershipCard">
+            <h2>💌 بطاقة العضوية 💌</h2>
+            <p><strong>العضو المميز:</strong> حبيبة قلبي للأبد ❤️</p>
+            <p><strong>الصلاحيات:</strong> امتلاك قلبي بالكامل 😍</p>
+        </div>
+
+        <div id="card">
+            <h2>💌 كرت العضوية 💌</h2>
+            <p>أنتِ الحب الأبدي، اضغطي لتكتشفي المزيد! 😘</p>
+        </div>
+
+        <!-- زر الانتقال إلى "ركن الذكريات" -->
+        <a href="memories.html">
+            <button class="memories-btn">📸 انتقلي إلى ركن الذكريات</button>
+        </a>
+    </div>
+
+    <script>
+        function showSurprise() {
+            let hearts = document.getElementById("hearts");
+            let membershipCard = document.getElementById("membershipCard");
+
+            // إظهار القلوب بتأثير متحرك
+            hearts.style.display = "block";
+
+            // بعد 1.5 ثانية، يظهر كرت العضوية
+            setTimeout(() => {
+                membershipCard.style.display = "block";
+                membershipCard.style.opacity = "1";
+            }, 1500);
+        }
+    </script>
+
+    <!-- أضف هذا الكود في كل الصفحات -->
+    <iframe src="music.html" allow="autoplay" id="musicFrame" style="display: none;"></iframe>
+
+</body>
+</html>
