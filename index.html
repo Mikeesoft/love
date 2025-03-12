@@ -7,8 +7,43 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <!-- إشعار منبثق عند الدخول -->
+    <div id="popup">
+        <div class="popup-content">
+            <h2>Hi I'm Sung Jin-Woo</h2>
+            <p>Welcome to My World</p>
+            <button onclick="closePopup()">Continue</button>
+        </div>
+    </div>
+
     <div class="container">
         <h1>Arise - Level Up</h1>
+
+        <!-- الألبوم الشبكي -->
+        <div class="album">
+            <div class="card">
+                <img src="1.gif" alt="Challenge 1">
+                <h3> soon </h3>
+            </div>
+            <div class="card">
+                <img src="2.gif" alt="Challenge 2">
+                <h3> soon </h3>
+            </div>
+            <div class="card">
+                <img src="3.gif" alt="Challenge 3">
+                <h3> soon </h3>
+            </div>
+            <div class="card">
+                <img src="4.jpg" alt="Challenge 4">
+                <h3> soon </h3>
+            </div>
+        </div>
     </div>
+
+    <script>
+        function closePopup() {
+            document.getElementById("popup").style.display = "none";
+        }
+    </script>
 </body>
 </html>
