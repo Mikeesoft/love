@@ -1,159 +1,94 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 body {
-    font-family: 'Cairo', sans-serif;
-    background-image: url('https://i.pinimg.com/564x/8e/5e/6d/8e5e6d8f8b8b8b8b8b8b8b8b8b8b8b8b.jpg'); /* خلفية زهور */
-    background-size: cover;
-    background-position: center;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    margin: 0;
+  font-family: 'Arial', sans-serif;
+  background: #f9f9f9;
+  color: #333;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
 }
 
 .chat-container {
-    width: 400px;
-    height: 80vh; /* ارتفاع مناسب للشاشة */
-    background-color: rgba(255, 255, 255, 0.9); /* خلفية شبه شفافة */
-    border-radius: 15px;
-    box-shadow: 0 0 20px rgba(255, 105, 180, 0.3); /* ظل وردي */
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    backdrop-filter: blur(5px); /* تأثير ضبابي */
+  background: #fff;
+  border-radius: 15px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 500px;
+  padding: 30px;
+  text-align: center;
+}
+
+h2 {
+  color: #f7a8b8;
+  font-size: 24px;
+  margin-bottom: 20px;
 }
 
 #chat-box {
-    flex: 1;
-    padding: 15px;
-    overflow-y: auto; /* تمكين التمرير عند زيادة الرسائل */
-    border-bottom: 1px solid #ffccd5; /* لون وردي فاتح */
-    display: flex;
-    flex-direction: column;
-    gap: 10px; /* مسافة بين الرسائل */
-    background-image: url('https://i.pinimg.com/564x/9a/7b/8d/9a7b8d8b8b8b8b8b8b8b8b8b8b8b8b8b.jpg'); /* خلفية مربع المحادثة */
-    background-size: cover;
-    background-position: center;
-    background-blend-mode: overlay; /* مزج الخلفية مع اللون الخلفي */
-    background-color: rgba(255, 255, 255, 0.7); /* لون خلفي شفاف */
-    user-select: none; /* منع نسخ النص */
-    -webkit-user-select: none; /* لمنع النسخ في المتصفحات التي تعتمد على WebKit */
-    -moz-user-select: none; /* لمنع النسخ في Firefox */
-    -ms-user-select: none; /* لمنع النسخ في Internet Explorer/Edge */
+  height: 300px;
+  overflow-y: auto;
+  margin-bottom: 20px;
+  border: 1px solid #f0c0c0;
+  border-radius: 10px;
+  padding: 10px;
+  background: #fafafa;
+  text-align: left;
 }
 
-#chat-box::selection {
-    background-color: transparent; /* إزالة لون الخلفية */
-    color: inherit; /* الحفاظ على لون النص الأصلي */
-}
-
-#chat-box::-moz-selection {
-    background-color: transparent; /* إزالة لون الخلفية في Firefox */
-    color: inherit;
-}
-
-.input-area {
-    display: flex;
-    padding: 10px;
-    background-color: #fff0f6; /* لون وردي فاتح */
-    position: sticky; /* مربع الإرسال ثابت */
-    bottom: 0; /* تثبيت في الأسفل */
+.message-box {
+  display: flex;
+  justify-content: space-between;
 }
 
 #message-input {
-    flex: 1;
-    padding: 10px;
-    border: 1px solid #ffccd5;
-    border-radius: 10px;
-    margin-right: 10px;
-    font-family: 'Cairo', sans-serif;
-    font-size: 14px;
-    color: #555;
+  width: 80%;
+  padding: 12px;
+  border: 1px solid #f0c0c0;
+  border-radius: 30px;
+  outline: none;
+  font-size: 14px;
+  color: #666;
+}
+
+#message-input:focus {
+  border-color: #f7a8b8;
 }
 
 button {
-    padding: 10px 20px;
-    background-color: #ff69b4; /* لون وردي */
-    color: #fff;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    font-family: 'Cairo', sans-serif;
-    font-size: 14px;
-    transition: background-color 0.3s;
+  width: 15%;
+  padding: 12px;
+  background: #f7a8b8;
+  color: white;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  font-size: 16px;
+  outline: none;
 }
 
 button:hover {
-    background-color: #ff1493; /* لون وردي داكن */
+  background: #f28ca1;
 }
 
-.message {
-    padding: 10px;
-    background-color: rgba(255, 240, 246, 0.8); /* لون وردي فاتح مع شفافية */
-    border-radius: 10px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-    position: relative;
-    max-width: 80%; /* عرض الرسائل */
-    align-self: flex-start; /* محاذاة الرسائل لليسار */
-    backdrop-filter: blur(2px); /* تأثير ضبابي خفيف */
-    user-select: none; /* منع النسخ */
-    -webkit-user-select: none; /* لمنع النسخ في المتصفحات التي تعتمد على WebKit */
-    -moz-user-select: none; /* لمنع النسخ في Firefox */
-    -ms-user-select: none; /* لمنع النسخ في Internet Explorer/Edge */
+button:focus {
+  outline: none;
 }
 
-.message::selection {
-    background-color: transparent; /* إزالة لون الخلفية */
-    color: inherit; /* الحفاظ على لون النص الأصلي */
+p {
+  background: #f8c7d5;
+  padding: 8px;
+  border-radius: 10px;
+  margin: 5px 0;
+  text-align: left;
+  color: #333;
 }
 
-.message::-moz-selection {
-    background-color: transparent; /* إزالة لون الخلفية في Firefox */
-    color: inherit;
-}
-
-.message.sent {
-    align-self: flex-end; /* محاذاة الرسائل المرسلة لليمين */
-    background-color: rgba(255, 204, 213, 0.8); /* لون مختلف للرسائل المرسلة */
-}
-
-/* تصميم إيموجي القائمة */
-.menu-icon {
-    position: absolute;
-    left: -25px;
-    top: 50%;
-    transform: translateY(-50%);
-    cursor: pointer;
-    font-size: 16px;
-}
-
-/* تصميم القائمة المنسدلة */
-.message-menu {
-    position: absolute;
-    left: -30px;
-    top: 50%;
-    transform: translateY(-50%);
-    background-color: #fff;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    display: none; /* إخفاء القائمة بشكل افتراضي */
-    z-index: 10;
-}
-
-.message-menu button {
-    display: block;
-    width: 100%;
-    padding: 8px 12px;
-    background-color: transparent;
-    border: none;
-    text-align: right;
-    font-family: 'Cairo', sans-serif;
-    font-size: 14px;
-    color: #555;
-    cursor: pointer;
-}
-
-.message-menu button:hover {
-    background-color: #f1f1f1;
+p:last-child {
+  margin-bottom: 0;
 }

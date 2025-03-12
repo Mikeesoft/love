@@ -1,69 +1,55 @@
+// استيراد Firebase
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
+import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-database.js";
+
+// تهيئة Firebase
 const firebaseConfig = {
-  apiKey: "API_KEY",
-  authDomain: "PROJECT_ID.firebaseapp.com",
-  databaseURL: "https://PROJECT_ID.firebaseio.com",
-  projectId: "PROJECT_ID",
-  storageBucket: "PROJECT_ID.appspot.com",
-  messagingSenderId: "SENDER_ID",
-  appId: "APP_ID"
+  apiKey: "AIzaSyBm5CBE58jP10qj3-Jtfcj5KDZu90jRSbI",
+  authDomain: "love-6f927.firebaseapp.com",
+  databaseURL: "https://love-6f927-default-rtdb.firebaseio.com",
+  projectId: "love-6f927",
+  storageBucket: "love-6f927.appspot.com",
+  messagingSenderId: "986690537911",
+  appId: "1:986690537911:web:4d5f980f39090249250032",
+  measurementId: "G-FVMS8SEGGF"
 };
-firebase.initializeApp(firebaseConfig);
-const database = firebase.database();
 
-const chatBox = document.getElementById('chat-box');
-const messageInput = document.getElementById('message-input');
+// تهيئة Firebase
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const messagesRef = ref(db, "messages");
 
-// تحميل الرسائل من Firebase
-function loadMessages() {
-  database.ref('messages').on('value', (snapshot) => {
-    chatBox.innerHTML = ''; // مسح الرسائل القديمة
-    const messages = snapshot.val() || [];
-    Object.values(messages).forEach((message, index) => {
-      addMessageToChatBox(message, index);
-    });
-  });
-}
-
-// إضافة رسالة جديدة إلى واجهة المحادثة
-function addMessageToChatBox(message, index) {
-  const messageElement = document.createElement('div');
-  messageElement.textContent = message;
-  messageElement.classList.add('message');
-  messageElement.setAttribute('data-index', index); // إضافة معرف للرسالة
-  
-  // إضافة إيموجي القائمة المنسدلة
-  const menuIcon = document.createElement('span');
-  menuIcon.textContent = '💬';
-  menuIcon.classList.add('menu-icon');
-  menuIcon.addEventListener('click', function(e) {
-    e.stopPropagation(); // منع انتشار الحدث
-    showMessageMenu(messageElement, index);
-  });
-  
-  messageElement.appendChild(menuIcon);
-  chatBox.appendChild(messageElement);
-  chatBox.scrollTop = chatBox.scrollHeight; // التمرير لأسفل تلقائيًا
-}
-
-// إرسال رسالة جديدة
+// دالة إرسال الرسالة
 function sendMessage() {
-  const message = messageInput.value.trim();
-  if (message !== "") {
-    // حفظ الرسالة في Firebase
-    const messagesRef = database.ref('messages');
-    messagesRef.push(message);
-    
-    // عرض الرسالة في واجهة المحادثة
-    addMessageToChatBox(message);
-    messageInput.value = '';
+  let messageInput = document.getElementById("message-input");
+  let message = messageInput.value.trim();
+  
+  if (message) {
+    push(messagesRef, { text: message, timestamp: Date.now() })
+      .then(() => {
+        console.log("✅ تم إرسال الرسالة بنجاح!");
+        messageInput.value = "";
+      })
+      .catch(error => console.error("❌ خطأ في إرسال الرسالة:", error));
+  } else {
+    console.warn("⚠️ لا يمكن إرسال رسالة فارغة!");
   }
 }
 
-// تحميل الرسائل عند فتح الصفحة
-loadMessages();
+// استقبال الرسائل وعرضها
+onChildAdded(messagesRef, (snapshot) => {
+  let chatBox = document.getElementById("chat-box");
+  let messageData = snapshot.val();
+  let messageElement = document.createElement("p");
+  messageElement.textContent = messageData.text;
+  chatBox.appendChild(messageElement);
+  chatBox.scrollTop = chatBox.scrollHeight;
+});
 
-// إرسال الرسالة عند الضغط على Enter
-messageInput.addEventListener('keypress', function(e) {
-  if (e.key === 'Enter') {
+// ربط الزر بالوظيفة
+document.getElementById("send-btn").addEventListener("click", sendMessage);
+document.getElementById("message-input").addEventListener("keypress", function(event) {
+  if (event.key === "Enter") {
     sendMessage();
   }
+});
