@@ -1,116 +1,159 @@
-/* تنسيق عام */
 body {
-    font-family: Arial, sans-serif;
-    background: #121212;
-    color: white;
-    text-align: center;
-    padding: 20px;
+    font-family: 'Cairo', sans-serif;
+    background-image: url('https://i.pinimg.com/564x/8e/5e/6d/8e5e6d8f8b8b8b8b8b8b8b8b8b8b8b8b.jpg'); /* خلفية زهور */
+    background-size: cover;
+    background-position: center;
     display: flex;
-    flex-direction: column;
     justify-content: center;
     align-items: center;
     height: 100vh;
     margin: 0;
 }
 
-/* تنسيق الحاوية الرئيسية */
-.container {
-    width: 90%;
-    max-width: 600px;
-    background: rgba(255, 255, 255, 0.1);
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0px 0px 10px rgba(0, 255, 255, 0.5);
-    text-align: center;
-}
-
-/* تنسيق الإشعار المنبثق */
-#popup {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.8);
+.chat-container {
+    width: 400px;
+    height: 80vh; /* ارتفاع مناسب للشاشة */
+    background-color: rgba(255, 255, 255, 0.9); /* خلفية شبه شفافة */
+    border-radius: 15px;
+    box-shadow: 0 0 20px rgba(255, 105, 180, 0.3); /* ظل وردي */
+    overflow: hidden;
     display: flex;
-    align-items: center;
-    justify-content: center;
+    flex-direction: column;
+    backdrop-filter: blur(5px); /* تأثير ضبابي */
 }
 
-.popup-content {
-    background: rgba(255, 255, 255, 0.1);
-    padding: 20px;
+#chat-box {
+    flex: 1;
+    padding: 15px;
+    overflow-y: auto; /* تمكين التمرير عند زيادة الرسائل */
+    border-bottom: 1px solid #ffccd5; /* لون وردي فاتح */
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* مسافة بين الرسائل */
+    background-image: url('https://i.pinimg.com/564x/9a/7b/8d/9a7b8d8b8b8b8b8b8b8b8b8b8b8b8b8b.jpg'); /* خلفية مربع المحادثة */
+    background-size: cover;
+    background-position: center;
+    background-blend-mode: overlay; /* مزج الخلفية مع اللون الخلفي */
+    background-color: rgba(255, 255, 255, 0.7); /* لون خلفي شفاف */
+    user-select: none; /* منع نسخ النص */
+    -webkit-user-select: none; /* لمنع النسخ في المتصفحات التي تعتمد على WebKit */
+    -moz-user-select: none; /* لمنع النسخ في Firefox */
+    -ms-user-select: none; /* لمنع النسخ في Internet Explorer/Edge */
+}
+
+#chat-box::selection {
+    background-color: transparent; /* إزالة لون الخلفية */
+    color: inherit; /* الحفاظ على لون النص الأصلي */
+}
+
+#chat-box::-moz-selection {
+    background-color: transparent; /* إزالة لون الخلفية في Firefox */
+    color: inherit;
+}
+
+.input-area {
+    display: flex;
+    padding: 10px;
+    background-color: #fff0f6; /* لون وردي فاتح */
+    position: sticky; /* مربع الإرسال ثابت */
+    bottom: 0; /* تثبيت في الأسفل */
+}
+
+#message-input {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ffccd5;
     border-radius: 10px;
-    text-align: center;
-    box-shadow: 0px 0px 10px rgba(0, 255, 255, 0.5);
+    margin-right: 10px;
+    font-family: 'Cairo', sans-serif;
+    font-size: 14px;
+    color: #555;
 }
 
 button {
-    background: cyan;
-    color: black;
-    border: none;
     padding: 10px 20px;
-    font-size: 18px;
-    border-radius: 5px;
+    background-color: #ff69b4; /* لون وردي */
+    color: #fff;
+    border: none;
+    border-radius: 10px;
     cursor: pointer;
-    transition: 0.3s;
-    margin: 5px;
+    font-family: 'Cairo', sans-serif;
+    font-size: 14px;
+    transition: background-color 0.3s;
 }
 
 button:hover {
-    background: #00e6e6;
+    background-color: #ff1493; /* لون وردي داكن */
 }
 
-/* تنسيق الألبوم الشبكي */
-.album {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 15px;
-    margin-top: 20px;
+.message {
     padding: 10px;
-}
-
-.card {
-    background: rgba(255, 255, 255, 0.1);
-    padding: 15px;
+    background-color: rgba(255, 240, 246, 0.8); /* لون وردي فاتح مع شفافية */
     border-radius: 10px;
-    text-align: center;
-    box-shadow: 0px 0px 10px rgba(0, 255, 255, 0.5);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    position: relative;
+    max-width: 80%; /* عرض الرسائل */
+    align-self: flex-start; /* محاذاة الرسائل لليسار */
+    backdrop-filter: blur(2px); /* تأثير ضبابي خفيف */
+    user-select: none; /* منع النسخ */
+    -webkit-user-select: none; /* لمنع النسخ في المتصفحات التي تعتمد على WebKit */
+    -moz-user-select: none; /* لمنع النسخ في Firefox */
+    -ms-user-select: none; /* لمنع النسخ في Internet Explorer/Edge */
 }
 
-.card img {
+.message::selection {
+    background-color: transparent; /* إزالة لون الخلفية */
+    color: inherit; /* الحفاظ على لون النص الأصلي */
+}
+
+.message::-moz-selection {
+    background-color: transparent; /* إزالة لون الخلفية في Firefox */
+    color: inherit;
+}
+
+.message.sent {
+    align-self: flex-end; /* محاذاة الرسائل المرسلة لليمين */
+    background-color: rgba(255, 204, 213, 0.8); /* لون مختلف للرسائل المرسلة */
+}
+
+/* تصميم إيموجي القائمة */
+.menu-icon {
+    position: absolute;
+    left: -25px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 16px;
+}
+
+/* تصميم القائمة المنسدلة */
+.message-menu {
+    position: absolute;
+    left: -30px;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    display: none; /* إخفاء القائمة بشكل افتراضي */
+    z-index: 10;
+}
+
+.message-menu button {
+    display: block;
     width: 100%;
-    border-radius: 10px;
-    margin-bottom: 10px;
+    padding: 8px 12px;
+    background-color: transparent;
+    border: none;
+    text-align: right;
+    font-family: 'Cairo', sans-serif;
+    font-size: 14px;
+    color: #555;
+    cursor: pointer;
 }
 
-.card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0px 0px 15px rgba(0, 255, 255, 0.8);
-}
-.card img {
-    width: 100%;
-    height: 150px; /* أو أي ارتفاع يناسب التصميم */
-    border-radius: 10px;
-    object-fit: cover;
-}
-/* تنسيق الألبوم ليكون على شكل 2×2 */
-.album {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr); /* عمودان */
-    gap: 15px;
-    margin-top: 20px;
-    padding: 10px;
-    width: 100%; /* السماح بامتداد الألبوم داخل الحاوية */
-    max-width: 100%; /* إزالة الحد الأقصى للعرض الذي يسبب الفراغ */
-    justify-content: center; /* توسيط العناصر في الشبكة */
-}
-
-/* ضبط الصور داخل البطاقات */
-.card img {
-    width: 100%;
-    height: 150px; /* ضمان نفس الطول لكل الصور */
-    border-radius: 10px;
-    object-fit: cover; /* يجعل الصور تغطي المساحة بالكامل بدون تشويه */
+.message-menu button:hover {
+    background-color: #f1f1f1;
 }

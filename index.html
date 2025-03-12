@@ -1,49 +1,20 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arise - Level Up</title>
+    <title>محادثتنا الخاصة</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-database.js"></script>
 </head>
 <body>
-    <!-- إشعار منبثق عند الدخول -->
-    <div id="popup">
-        <div class="popup-content">
-            <h2>Hi I'm Sung Jin-Woo</h2>
-            <p>Welcome to My World</p>
-            <button onclick="closePopup()">Continue</button>
+    <div class="chat-container">
+        <div id="chat-box"></div>
+        <div class="input-area">
+            <input type="text" id="message-input" placeholder="اكتب رسالتك هنا...">
+            <button onclick="sendMessage()">إرسال 💌</button>
         </div>
     </div>
-
-    <div class="container">
-        <h1>Arise - Level Up</h1>
-
-        <!-- الألبوم الشبكي -->
-        <div class="album">
-            <div class="card">
-                <img src="1.gif" alt="Challenge 1">
-                <h3> soon </h3>
-            </div>
-            <div class="card">
-                <img src="2.gif" alt="Challenge 2">
-                <h3> soon </h3>
-            </div>
-            <div class="card">
-                <img src="3.gif" alt="Challenge 3">
-                <h3> soon </h3>
-            </div>
-            <div class="card">
-                <img src="4.jpg" alt="Challenge 4">
-                <h3> soon </h3>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        function closePopup() {
-            document.getElementById("popup").style.display = "none";
-        }
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
