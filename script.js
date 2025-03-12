@@ -1,6 +1,7 @@
 // استيراد Firebase
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
 import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-database.js";
+import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-storage.js";
 
 // تهيئة Firebase
 const firebaseConfig = {
@@ -14,42 +15,58 @@ const firebaseConfig = {
   measurementId: "G-FVMS8SEGGF"
 };
 
-// تهيئة Firebase
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
+const storage = getStorage(app);
 const messagesRef = ref(db, "messages");
 
-// دالة إرسال الرسالة
+// إرسال الرسائل النصية
 function sendMessage() {
   let messageInput = document.getElementById("message-input");
   let message = messageInput.value.trim();
   
   if (message) {
-    push(messagesRef, { text: message, timestamp: Date.now() })
-      .then(() => {
-        console.log("✅ تم إرسال الرسالة بنجاح!");
-        messageInput.value = "";
-      })
-      .catch(error => console.error("❌ خطأ في إرسال الرسالة:", error));
-  } else {
-    console.warn("⚠️ لا يمكن إرسال رسالة فارغة!");
+    push(messagesRef, { text: message, timestamp: Date.now() });
+    messageInput.value = "";
   }
 }
 
-// استقبال الرسائل وعرضها
+// إرسال الصور
+function sendImage(file) {
+  if (!file) return;
+  
+  const fileRef = storageRef(storage, `images/${file.name}`);
+  uploadBytes(fileRef, file).then(snapshot => {
+    return getDownloadURL(snapshot.ref);
+  }).then(url => {
+    push(messagesRef, { imageUrl: url, timestamp: Date.now() });
+  }).catch(error => console.error("❌ خطأ في تحميل الصورة:", error));
+}
+
+// استقبال الرسائل والصور
 onChildAdded(messagesRef, (snapshot) => {
   let chatBox = document.getElementById("chat-box");
   let messageData = snapshot.val();
-  let messageElement = document.createElement("p");
-  messageElement.textContent = messageData.text;
+  let messageElement = document.createElement("div");
+  messageElement.classList.add("message");
+  
+  if (messageData.text) {
+    messageElement.innerHTML = `<p>${messageData.text}</p>`;
+  } else if (messageData.imageUrl) {
+    messageElement.innerHTML = `<img src="${messageData.imageUrl}" alt="📷 صورة مرسلة">`;
+  }
+  
   chatBox.appendChild(messageElement);
   chatBox.scrollTop = chatBox.scrollHeight;
 });
 
-// ربط الزر بالوظيفة
+// التعامل مع الإدخال
 document.getElementById("send-btn").addEventListener("click", sendMessage);
 document.getElementById("message-input").addEventListener("keypress", function(event) {
-  if (event.key === "Enter") {
-    sendMessage();
-  }
+  if (event.key === "Enter") sendMessage();
+});
+
+// إرسال الصور عند اختيارها
+document.getElementById("file-input").addEventListener("change", function(event) {
+  sendImage(event.target.files[0]);
 });

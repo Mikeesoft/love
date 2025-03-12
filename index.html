@@ -3,15 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>دردشة مباشرة</title>
+    <title>My Heart 💖</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="chat-container">
-        <h2>دردشة مباشرة</h2>
+        <h2>💖 My Heart 💋</h2>
         <div id="chat-box"></div>
-        <input type="text" id="message-input" placeholder="اكتب رسالة..." onkeypress="handleKeyPress(event)">
-        <button id="send-btn">إرسال</button>
+        
+        <div class="message-box">
+            <label for="image-input" class="file-label">📎</label>
+            <input type="file" id="image-input" accept="image/*">
+            <input type="text" id="message-input" placeholder="اكتب رسالة مثيرة...">
+            <button id="send-btn">➤</button>
+        </div>
     </div>
 
     <script type="module" src="script.js"></script>
