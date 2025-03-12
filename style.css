@@ -5,9 +5,9 @@
 }
 
 body {
-  font-family: 'Arial', sans-serif;
-  background: #f9f9f9;
-  color: #333;
+  font-family: 'Cairo', sans-serif;
+  background: linear-gradient(to right, #f78fb3, #f7a8b8);
+  color: #fff;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -15,73 +15,85 @@ body {
 }
 
 .chat-container {
-  background: #fff;
+  background: rgba(255, 255, 255, 0.9);
   border-radius: 15px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   width: 100%;
   max-width: 500px;
-  padding: 30px;
+  padding: 20px;
   text-align: center;
 }
 
 h2 {
-  color: #f7a8b8;
+  color: #e84393;
   font-size: 24px;
-  margin-bottom: 20px;
+  margin-bottom: 15px;
 }
 
 #chat-box {
   height: 300px;
   overflow-y: auto;
-  margin-bottom: 20px;
   border: 1px solid #f0c0c0;
   border-radius: 10px;
   padding: 10px;
-  background: #fafafa;
+  background: #ffe6ea;
   text-align: left;
 }
 
 .message-box {
   display: flex;
-  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+  background: #fff;
+  border-radius: 30px;
+  padding: 5px;
+}
+
+.file-label {
+  font-size: 20px;
+  cursor: pointer;
+  color: #e84393;
+  margin-right: 10px;
+}
+
+input[type="file"] {
+  display: none;
 }
 
 #message-input {
-  width: 80%;
+  flex: 2;
   padding: 12px;
-  border: 1px solid #f0c0c0;
+  border: none;
   border-radius: 30px;
   outline: none;
   font-size: 14px;
-  color: #666;
+  color: #333;
+  background: transparent;
 }
 
-#message-input:focus {
-  border-color: #f7a8b8;
-}
-
-button {
-  width: 15%;
+#send-btn {
   padding: 12px;
-  background: #f7a8b8;
+  background: #e84393;
   color: white;
   border: none;
-  border-radius: 30px;
+  border-radius: 50%;
   cursor: pointer;
   font-size: 16px;
   outline: none;
+  width: 40px;
+  height: 40px;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-button:hover {
-  background: #f28ca1;
-}
-
-button:focus {
-  outline: none;
+#send-btn:hover {
+  background: #d63077;
 }
 
 p {
-  background: #f8c7d5;
+  background: #ffb6c1;
   padding: 8px;
   border-radius: 10px;
   margin: 5px 0;
@@ -89,6 +101,43 @@ p {
   color: #333;
 }
 
-p:last-child {
-  margin-bottom: 0;
+img {
+  max-width: 100%;
+  border-radius: 10px;
+  margin-top: 5px;
+}
+/* إزالة تأثير الضغط على جميع الأزرار وحقول الإدخال */
+button, input, .file-label {
+    outline: none;
+    border: none;
+    user-select: none;  
+    -webkit-tap-highlight-color: transparent; 
+}
+
+/* إزالة التأثير عند الضغط على زر اختيار الملف */
+input[type="file"] {
+    outline: none;
+    border: none;
+    -webkit-tap-highlight-color: transparent;
+    opacity: 0; /* إخفاء الزر الأصلي وجعل التصميم الخاص بك يظهر بدلاً منه */
+    position: absolute;
+    width: 0;
+    height: 0;
+}
+
+/* تحسين زر اختيار الملفات ليكون أكثر تناسقًا */
+.file-label {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 15px;
+    background: #ffafc9;
+    color: white;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.file-label:hover {
+    background: #ff91b5;
 }
