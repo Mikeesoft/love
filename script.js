@@ -54,23 +54,26 @@ function sendImage(file) {
   }).catch(error => console.error("❌ خطأ في تحميل الصورة:", error));
 }
 
-// استقبال الرسائل والصور مع عرض التوقيت
+// استقبال الرسائل والصور مع تحديد الاتجاه
 onChildAdded(messagesRef, (snapshot) => {
-  let chatBox = document.getElementById("chat-box");
-  let messageData = snapshot.val();
-  let messageElement = document.createElement("div");
-  messageElement.classList.add("message");
-  
-  let formattedTime = formatTimestamp(messageData.timestamp);
-  
-  if (messageData.text) {
-    messageElement.innerHTML = `<p>${messageData.text}<br><span class="time">${formattedTime}</span></p>`;
-  } else if (messageData.imageUrl) {
-    messageElement.innerHTML = `<img src="${messageData.imageUrl}" alt="📷 صورة مرسلة"><br><span class="time">${formattedTime}</span>`;
-  }
-  
-  chatBox.appendChild(messageElement);
-  chatBox.scrollTop = chatBox.scrollHeight;
+    let chatBox = document.getElementById("chat-box");
+    let messageData = snapshot.val();
+    let messageElement = document.createElement("div");
+
+    // تحديد اتجاه الرسالة بناءً على المرسل
+    let messageClass = messageData.sender === "me" ? "sent" : "received";
+    messageElement.classList.add("message", messageClass);
+
+    let formattedTime = formatTimestamp(messageData.timestamp);
+
+    if (messageData.text) {
+        messageElement.innerHTML = `<p>${messageData.text}<br><span class="time">${formattedTime}</span></p>`;
+    } else if (messageData.imageUrl) {
+        messageElement.innerHTML = `<img src="${messageData.imageUrl}" alt="📷 صورة مرسلة"><br><span class="time">${formattedTime}</span>`;
+    }
+
+    chatBox.appendChild(messageElement);
+    chatBox.scrollTop = chatBox.scrollHeight;
 });
 
 // التعامل مع الإدخال

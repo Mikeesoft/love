@@ -2,15 +2,17 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  transition: background 0.5s ease, color 0.5s ease;
 }
 
 body {
   font-family: 'Cairo', sans-serif;
-  background: linear-gradient(to right, #f78fb3, #f7a8b8);
-  color: #fff;
+  background: #ffe6ea;
+  color: #333;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
+  justify-content: center;
   height: 100vh;
 }
 
@@ -26,8 +28,6 @@ body {
 
 h2 {
   color: #e84393;
-  font-size: 24px;
-  margin-bottom: 15px;
 }
 
 #chat-box {
@@ -37,23 +37,6 @@ h2 {
   border-radius: 10px;
   padding: 10px;
   background: #ffe6ea;
-  text-align: left;
-}
-
-.message {
-  background: #ffb6c1;
-  padding: 8px;
-  border-radius: 10px;
-  margin: 5px 0;
-  text-align: left;
-  color: #333;
-  position: relative;
-}
-
-.timestamp {
-  font-size: 12px;
-  color: #777;
-  float: right;
 }
 
 .message-box {
@@ -81,7 +64,6 @@ input[type="file"] {
   padding: 12px;
   border: none;
   border-radius: 30px;
-  outline: none;
   font-size: 14px;
   color: #333;
   background: transparent;
@@ -95,56 +77,237 @@ input[type="file"] {
   border-radius: 50%;
   cursor: pointer;
   font-size: 16px;
-  outline: none;
   width: 40px;
   height: 40px;
-  text-align: center;
+}
+
+/* زر وضع الظلام والنور */
+.theme-toggle {
+  background: #111;
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: space-between;
+  width: 70px;
+  height: 35px;
+  padding: 5px;
+  border-radius: 50px;
+  position: relative;
+  margin-bottom: 20px;
 }
 
-#send-btn:hover {
-  background: #d63077;
+.mode_moon {
+  width: 25px;
+  height: 25px;
+  background-image: url("moon.png");
+  background-size: cover;
+  background-repeat: no-repeat;
 }
 
-img {
+.mode_sun {
+  width: 25px;
+  height: 25px;
+  background-image: url("sun.png");
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.mode_ball {
+  position: absolute;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  background: #fff;
+  left: 5px;
+  transition: all 0.5s ease;
+}
+
+/* وضع الظلام */
+.dark-mode {
+  background: #111 !important;
+  color: white !important;
+}
+
+.dark-mode .chat-container {
+  background: rgba(20, 20, 20, 0.9);
+}
+
+.dark-mode #chat-box {
+  background: #222;
+  border-color: #444;
+}
+
+.dark-mode .message-box {
+  background: #333;
+}
+
+.dark-mode #message-input {
+  color: white;
+}
+
+.dark-mode #send-btn {
+  background: #ff4081;
+}
+
+.dark-mode .mode_ball {
+  left: 40px;
+  background: #111;
+}
+
+.dark-mode .theme-toggle {
+  background: #fff;
+}
+
+#chat-box {
+  height: 300px;
+  overflow-y: auto;
+  border: 1px solid #f0c0c0;
+  border-radius: 10px;
+  padding: 10px;
+  background: #ffe6ea;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.message {
+  max-width: 75%;
+  padding: 10px;
+  border-radius: 15px;
+  font-size: 14px;
+  position: relative;
+  word-wrap: break-word;
+  line-height: 1.5;
+  display: flex;
+  flex-direction: column;
+}
+
+.sent {
+  align-self: flex-end;
+  background: #e84393;
+  color: white;
+  border-bottom-right-radius: 2px;
+}
+
+.received {
+  align-self: flex-start;
+  background: #ffb6c1;
+  color: #333;
+  border-bottom-left-radius: 2px;
+}
+
+.message img {
   max-width: 100%;
   border-radius: 10px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
   margin-top: 5px;
 }
+
 .time {
-  display: block;
   font-size: 12px;
   color: #555;
   margin-top: 5px;
   text-align: right;
 }
-input[type="file"] {
-    outline: none;
-    border: none;
-    -webkit-tap-highlight-color: transparent;
-    opacity: 0; /* إخفاء الزر الأصلي وجعل التصميم الخاص بك يظهر بدلاً منه */
-    position: absolute;
-    width: 0;
-    height: 0;
+.message {
+    max-width: 75%;
+    padding: 10px;
+    border-radius: 15px;
+    font-size: 14px;
+    position: relative;
+    word-wrap: break-word;
+    line-height: 1.5;
+    display: flex;
+    flex-direction: column;
 }
 
-/* تحسين زر اختيار الملفات ليكون أكثر تناسقًا */
-.file-label {
-    display: inline-flex;
+.sent {
+    align-self: flex-end;
+    background: #e84393;
+    color: white;
+    border-bottom-right-radius: 2px;
+    text-align: right;
+}
+
+.received {
+    align-self: flex-start;
+    background: #ffb6c1;
+    color: #333;
+    border-bottom-left-radius: 2px;
+    text-align: left;
+}
+/* النافذة المنبثقة */
+.popup {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
     align-items: center;
     justify-content: center;
-    padding: 10px 15px;
-    background: #ffafc9;
-    color: white;
-    border-radius: 50px;
-    cursor: pointer;
-    transition: 0.3s;
+    z-index: 1000;
 }
 
-.file-label:hover {
-    background: #ff91b5;
+/* محتوى النافذة المنبثقة - حجم أصغر وفي المنتصف */
+.popup-content {
+    background: white;
+    padding: 15px;
+    border-radius: 15px;
+    position: relative;
+    width: 300px;  /* تعديل الحجم */
+    text-align: center;
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
+    animation: fadeIn 0.4s ease-in-out;
+}
+
+/* تأثير الظهور */
+@keyframes fadeIn {
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+/* زر الإغلاق */
+.close {
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    font-size: 20px;
+    cursor: pointer;
+    color: red;
+    font-weight: bold;
+}
+
+.close:hover {
+    color: darkred;
+}
+
+/* صورة داخل النافذة */
+.popup-content img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px;
+}
+/* أزرار التنقل بين الصور */
+.popup-controls {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+
+.popup-controls button {
+    background: #e84393;
+    border: none;
+    color: white;
+    padding: 8px 12px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+.popup-controls button:hover {
+    background: #c82373;
 }
 /* منع التأثير الأزرق عند الضغط */
 * {
