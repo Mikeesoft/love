@@ -5,7 +5,7 @@ import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "http
 
 // تهيئة Firebase
 const firebaseConfig = {
-  apiKey: "AIzaSyBm5CBE58jP10qj3-Jtfcj5KDZu90jRSbI",
+  apiKey: "AIzaSyBm5C...",
   authDomain: "love-6f927.firebaseapp.com",
   databaseURL: "https://love-6f927-default-rtdb.firebaseio.com",
   projectId: "love-6f927",
@@ -19,6 +19,17 @@ const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const storage = getStorage(app);
 const messagesRef = ref(db, "messages");
+
+// تحويل التوقيت إلى صيغة مفهومة
+function formatTimestamp(timestamp) {
+  const date = new Date(timestamp);
+  const hours = date.getHours().toString().padStart(2, "0");
+  const minutes = date.getMinutes().toString().padStart(2, "0");
+  const day = date.getDate().toString().padStart(2, "0");
+  const month = (date.getMonth() + 1).toString().padStart(2, "0");
+  const year = date.getFullYear();
+  return `${hours}:${minutes} - ${day}/${month}/${year}`;
+}
 
 // إرسال الرسائل النصية
 function sendMessage() {
@@ -43,17 +54,19 @@ function sendImage(file) {
   }).catch(error => console.error("❌ خطأ في تحميل الصورة:", error));
 }
 
-// استقبال الرسائل والصور
+// استقبال الرسائل والصور مع عرض التوقيت
 onChildAdded(messagesRef, (snapshot) => {
   let chatBox = document.getElementById("chat-box");
   let messageData = snapshot.val();
   let messageElement = document.createElement("div");
   messageElement.classList.add("message");
   
+  let formattedTime = formatTimestamp(messageData.timestamp);
+  
   if (messageData.text) {
-    messageElement.innerHTML = `<p>${messageData.text}</p>`;
+    messageElement.innerHTML = `<p>${messageData.text}<br><span class="time">${formattedTime}</span></p>`;
   } else if (messageData.imageUrl) {
-    messageElement.innerHTML = `<img src="${messageData.imageUrl}" alt="📷 صورة مرسلة">`;
+    messageElement.innerHTML = `<img src="${messageData.imageUrl}" alt="📷 صورة مرسلة"><br><span class="time">${formattedTime}</span>`;
   }
   
   chatBox.appendChild(messageElement);
