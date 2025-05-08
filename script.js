@@ -1,9 +1,9 @@
-// استيراد Firebase
+// Firebase - تهيئة
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
 import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-database.js";
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-storage.js";
 
-// تهيئة Firebase
+// إعداد Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyBm5C...",
   authDomain: "love-6f927.firebaseapp.com",
@@ -20,7 +20,7 @@ const db = getDatabase(app);
 const storage = getStorage(app);
 const messagesRef = ref(db, "messages");
 
-// تحويل التوقيت إلى صيغة مفهومة
+// تحويل الوقت لصيغة واضحة
 function formatTimestamp(timestamp) {
   const date = new Date(timestamp);
   const hours = date.getHours().toString().padStart(2, "0");
@@ -31,58 +31,76 @@ function formatTimestamp(timestamp) {
   return `${hours}:${minutes} - ${day}/${month}/${year}`;
 }
 
-// إرسال الرسائل النصية
+// إرسال رسالة نصية
 function sendMessage() {
-  let messageInput = document.getElementById("message-input");
-  let message = messageInput.value.trim();
-  
+  const input = document.getElementById("message-input");
+  const message = input.value.trim();
   if (message) {
     push(messagesRef, { text: message, timestamp: Date.now() });
-    messageInput.value = "";
+    input.value = "";
   }
 }
 
-// إرسال الصور
+// إرسال صورة
 function sendImage(file) {
   if (!file) return;
-  
   const fileRef = storageRef(storage, `images/${file.name}`);
-  uploadBytes(fileRef, file).then(snapshot => {
-    return getDownloadURL(snapshot.ref);
-  }).then(url => {
-    push(messagesRef, { imageUrl: url, timestamp: Date.now() });
-  }).catch(error => console.error("❌ خطأ في تحميل الصورة:", error));
+  uploadBytes(fileRef, file).then(snapshot => getDownloadURL(snapshot.ref))
+    .then(url => {
+      push(messagesRef, { imageUrl: url, timestamp: Date.now() });
+    })
+    .catch(err => console.error("❌ خطأ في تحميل الصورة:", err));
 }
 
-// استقبال الرسائل والصور مع تحديد الاتجاه
-onChildAdded(messagesRef, (snapshot) => {
-    let chatBox = document.getElementById("chat-box");
-    let messageData = snapshot.val();
-    let messageElement = document.createElement("div");
+// استقبال الرسائل
+onChildAdded(messagesRef, snapshot => {
+  const chatBox = document.getElementById("chat-box");
+  const data = snapshot.val();
+  const msg = document.createElement("div");
 
-    // تحديد اتجاه الرسالة بناءً على المرسل
-    let messageClass = messageData.sender === "me" ? "sent" : "received";
-    messageElement.classList.add("message", messageClass);
+  const messageClass = data.sender === "me" ? "sent" : "received";
+  msg.classList.add("message", messageClass);
 
-    let formattedTime = formatTimestamp(messageData.timestamp);
+  const time = formatTimestamp(data.timestamp);
 
-    if (messageData.text) {
-        messageElement.innerHTML = `<p>${messageData.text}<br><span class="time">${formattedTime}</span></p>`;
-    } else if (messageData.imageUrl) {
-        messageElement.innerHTML = `<img src="${messageData.imageUrl}" alt="📷 صورة مرسلة"><br><span class="time">${formattedTime}</span>`;
+  if (data.text) {
+    msg.innerHTML = `<p>${data.text}<br><span class="time">${time}</span></p>`;
+  } else if (data.imageUrl) {
+    msg.innerHTML = `<img src="${data.imageUrl}" alt="📷 صورة"><br><span class="time">${time}</span>`;
+  }
+
+  chatBox.appendChild(msg);
+  chatBox.scrollTop = chatBox.scrollHeight;
+});
+
+// الوضع الليلي
+document.addEventListener("DOMContentLoaded", () => {
+  const ball = document.getElementById("ball");
+  const body = document.body;
+
+  // حفظ واسترجاع الوضع من التخزين المحلي
+  if (localStorage.getItem("theme") === "dark") {
+    body.classList.add("dark-mode");
+    ball.style.left = "40px";
+  }
+
+  ball.addEventListener("click", () => {
+    body.classList.toggle("dark-mode");
+    if (body.classList.contains("dark-mode")) {
+      localStorage.setItem("theme", "dark");
+      ball.style.left = "40px";
+    } else {
+      localStorage.setItem("theme", "light");
+      ball.style.left = "5px";
     }
+  });
 
-    chatBox.appendChild(messageElement);
-    chatBox.scrollTop = chatBox.scrollHeight;
-});
-
-// التعامل مع الإدخال
-document.getElementById("send-btn").addEventListener("click", sendMessage);
-document.getElementById("message-input").addEventListener("keypress", function(event) {
-  if (event.key === "Enter") sendMessage();
-});
-
-// إرسال الصور عند اختيارها
-document.getElementById("file-input").addEventListener("change", function(event) {
-  sendImage(event.target.files[0]);
+  // التعامل مع الرسائل
+  document.getElementById("send-btn").addEventListener("click", sendMessage);
+  document.getElementById("message-input").addEventListener("keypress", e => {
+    if (e.key === "Enter") sendMessage();
+  });
+  document.getElementById("file-input").addEventListener("change", e => {
+    sendImage(e.target.files[0]);
+  });
 });
