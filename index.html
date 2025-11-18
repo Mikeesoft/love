@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="theme-color" content="#e91e63">
-  <title>شات أسطوري</title>
+  <title>شات أسطوري متكامل</title>
   <link rel="stylesheet" href="style.css">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <script type="module" src="script.js" defer></script>
@@ -21,28 +21,47 @@
   </div>
 
   <div class="chat-container">
-    
     <header class="chat-header">
       <div class="header-info">
-        <h2>غرفة الشات العامة</h2>
-        <div class="typing-status"></div>
+        <h2>غرفة الشات العامة 💬</h2>
+        <div class="status-bar">
+          <span class="typing-status"></span>
+        </div>
       </div>
       <button id="theme-toggle" class="icon-btn">🌙</button>
     </header>
 
     <div id="chat-box"></div>
 
+    <div id="reply-preview" class="reply-preview hidden">
+      <div class="reply-content">
+        <span class="reply-title">الرد على:</span>
+        <span id="reply-text-preview">نص الرسالة...</span>
+      </div>
+      <button id="close-reply" class="icon-btn"><span class="material-icons">close</span></button>
+    </div>
+
     <div class="input-area">
-      <label for="file-input" class="attach-btn">
-        <span class="material-icons">attach_file</span>
-      </label>
+      <button id="emoji-btn" class="icon-btn">😊</button>
+      
+      <label for="file-input" class="attach-btn"><span class="material-icons">attach_file</span></label>
       <input type="file" id="file-input" accept="image/*" hidden>
       
-      <input type="text" id="message-input" placeholder="اكتب رسالة..." autocomplete="off" enterkeyhint="send">
+      <input type="text" id="message-input" placeholder="رسالة..." autocomplete="off" enterkeyhint="send">
       
-      <button id="send-btn" class="send-btn">
+      <button id="send-btn" class="send-btn hidden">
         <span class="material-icons">send</span>
       </button>
+
+      <button id="mic-btn" class="mic-btn">
+        <span class="material-icons">mic</span>
+      </button>
+    </div>
+
+    <div id="emoji-picker" class="emoji-picker hidden">
+      <span>😂</span><span>❤️</span><span>😍</span><span>👍</span><span>🔥</span>
+      <span>😭</span><span>😮</span><span>🎉</span><span>🌹</span><span>😎</span>
+      <span>😡</span><span>🤔</span><span>👋</span><span>🤝</span><span>✅</span>
     </div>
   </div>
 
