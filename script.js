@@ -3,7 +3,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebas
 import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-database.js";
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-storage.js";
 
-// إعداد Firebase (نفس بياناتك القديمة)
+// إعداد Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyBm5C...", 
   authDomain: "love-6f927.firebaseapp.com",
@@ -25,20 +25,19 @@ let myId = localStorage.getItem("chat_user_id");
 let myName = localStorage.getItem("chat_username");
 const nameModal = document.getElementById("name-modal");
 
-// لو مفيش ID نعمل واحد
+// إنشاء ID لو مش موجود
 if (!myId) {
     myId = "user_" + Date.now() + "_" + Math.floor(Math.random() * 1000);
     localStorage.setItem("chat_user_id", myId);
 }
 
-// لو مفيش اسم، نظهر النافذة، ولو فيه نخفيها
+// التحكم في نافذة الاسم
 if (!myName) {
     nameModal.style.display = "flex";
 } else {
     nameModal.style.display = "none";
 }
 
-// زر حفظ الاسم
 document.getElementById("save-name-btn").addEventListener("click", () => {
     const nameInput = document.getElementById("username-input").value.trim();
     if (nameInput) {
@@ -51,30 +50,66 @@ document.getElementById("save-name-btn").addEventListener("click", () => {
 });
 
 
-// تحويل الوقت
+// ==========================================
+// دالة تنسيق الوقت الذكية (التعديل الجديد) 🕒
+// ==========================================
 function formatTimestamp(timestamp) {
   const date = new Date(timestamp);
-  const hours = date.getHours().toString().padStart(2, "0");
+  const now = new Date();
+
+  // تجهيز الوقت بصيغة 12 ساعة (ص/م)
+  let hours = date.getHours();
   const minutes = date.getMinutes().toString().padStart(2, "0");
-  return `${hours}:${minutes}`;
+  const ampm = hours >= 12 ? "م" : "ص";
+  hours = hours % 12;
+  hours = hours ? hours : 12; // الساعة 0 تبقى 12
+  const timeString = `${hours}:${minutes} ${ampm}`;
+
+  // مقارنة التواريخ
+  const isToday = date.getDate() === now.getDate() &&
+                  date.getMonth() === now.getMonth() &&
+                  date.getFullYear() === now.getFullYear();
+
+  const yesterday = new Date(now);
+  yesterday.setDate(now.getDate() - 1);
+  const isYesterday = date.getDate() === yesterday.getDate() &&
+                      date.getMonth() === yesterday.getMonth() &&
+                      date.getFullYear() === yesterday.getFullYear();
+
+  // المنطق:
+  // 1. لو النهاردة -> اعرض الوقت بس
+  // 2. لو امبارح -> اكتب "أمس" + الوقت
+  // 3. لو أقدم -> اعرض التاريخ كامل
+  
+  if (isToday) {
+    return timeString;
+  } else if (isYesterday) {
+    return `أمس ${timeString}`;
+  } else {
+    const day = date.getDate().toString().padStart(2, "0");
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`; // التاريخ فقط للرسائل القديمة عشان الزحمة
+  }
 }
 
-// إرسال رسالة نصية (تعديل: إضافة الاسم)
+
+// إرسال رسالة نصية
 function sendMessage() {
   const input = document.getElementById("message-input");
   const message = input.value.trim();
-  if (message && myName) { // لازم يكون فيه اسم
+  if (message && myName) {
     push(messagesRef, { 
         text: message, 
         timestamp: Date.now(),
         senderId: myId,
-        senderName: myName // بنبعت الاسم هنا
+        senderName: myName
     });
     input.value = "";
   }
 }
 
-// إرسال صورة (تعديل: إضافة الاسم)
+// إرسال صورة
 function sendImage(file) {
   if (!file || !myName) return;
   const fileRef = storageRef(storage, `images/${file.name}`);
@@ -90,7 +125,7 @@ function sendImage(file) {
     .catch(err => console.error("❌ خطأ:", err));
 }
 
-// استقبال الرسائل (تعديل: عرض الاسم للآخرين فقط)
+// استقبال وعرض الرسائل
 onChildAdded(messagesRef, snapshot => {
   const chatBox = document.getElementById("chat-box");
   const data = snapshot.val();
@@ -100,25 +135,25 @@ onChildAdded(messagesRef, snapshot => {
   const messageClass = isMe ? "sent" : "received";
   msg.classList.add("message", messageClass);
 
-  const time = formatTimestamp(data.timestamp);
+  // استدعاء دالة الوقت الجديدة
+  const timeDisplay = formatTimestamp(data.timestamp);
   
-  // لو الرسالة من شخص تاني، نعرض اسمه، لو مني أنا مش لازم اشوف اسمي
   let nameHtml = "";
   if (!isMe) {
       nameHtml = `<span class="sender-name">${data.senderName || "مجهول"}</span>`;
   }
 
   if (data.text) {
-    msg.innerHTML = `${nameHtml}<p>${data.text}<br><span class="time">${time}</span></p>`;
+    msg.innerHTML = `${nameHtml}<p>${data.text}<br><span class="time">${timeDisplay}</span></p>`;
   } else if (data.imageUrl) {
-    msg.innerHTML = `${nameHtml}<img src="${data.imageUrl}" alt="صورة"><br><span class="time">${time}</span>`;
+    msg.innerHTML = `${nameHtml}<img src="${data.imageUrl}" alt="صورة"><br><span class="time">${timeDisplay}</span>`;
   }
 
   chatBox.appendChild(msg);
   chatBox.scrollTop = chatBox.scrollHeight;
 });
 
-// الوضع الليلي والأحداث
+// الأحداث والوضع الليلي
 document.addEventListener("DOMContentLoaded", () => {
   const ball = document.getElementById("ball");
   const body = document.body;
