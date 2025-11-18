@@ -5,26 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>شات وردي أسطوري</title>
   <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <script type="module" src="script.js"></script>
 </head>
 <body>
 
-  <div id="login-screen" class="modal-overlay">
-    <div class="login-box">
-      <h1>🌸 أهلاً في الشات الوردي</h1>
-      <p>سجل دخولك عشان تنضم للشلة!</p>
-      <button id="google-login-btn">
-        <i class="fab fa-google"></i> دخول بواسطة جوجل
-      </button>
+  <div id="name-modal" class="modal-overlay">
+    <div class="modal-content">
+      <h3>أدخل اسمك يا بطل 🌸</h3>
+      <input type="text" id="username-input" placeholder="اسمك هنا..." maxlength="15">
+      <button id="save-name-btn">دخول الشات</button>
     </div>
   </div>
 
-  <div class="chat-container" id="main-chat" style="display: none;">
-    <div class="header-controls">
-      <div id="ball" title="تبديل الوضع الليلي"></div>
-      <button id="logout-btn" title="تسجيل خروج"><i class="fas fa-sign-out-alt"></i></button>
-    </div>
+  <div class="chat-container">
+    <div id="ball" title="تبديل الوضع الليلي"></div>
 
     <h2>غرفة الشات الوردية</h2>
 
@@ -34,7 +28,7 @@
       <input type="text" id="message-input" placeholder="اكتب رسالتك هنا...">
       <label for="file-input" id="file-input-label">📎</label>
       <input type="file" id="file-input" accept="image/*">
-      <button id="send-btn"><i class="fas fa-paper-plane"></i></button>
+      <button id="send-btn">إرسال</button>
     </div>
   </div>
 

@@ -1,12 +1,11 @@
-// استيراد المكتبات
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
-import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-storage.js";
+// Firebase - تهيئة
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
+import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-database.js";
+import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-storage.js";
 
 // إعداد Firebase
 const firebaseConfig = {
-  apiKey: "AIzaSyBm5C...", // ⚠️ حط مفتاحك الكامل هنا
+  apiKey: "AIzaSyBm5C...", 
   authDomain: "love-6f927.firebaseapp.com",
   databaseURL: "https://love-6f927-default-rtdb.firebaseio.com",
   projectId: "love-6f927",
@@ -17,81 +16,94 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
 const db = getDatabase(app);
 const storage = getStorage(app);
 const messagesRef = ref(db, "messages");
-const provider = new GoogleAuthProvider();
 
-// العناصر من HTML
-const loginScreen = document.getElementById("login-screen");
-const chatContainer = document.getElementById("main-chat");
-const googleLoginBtn = document.getElementById("google-login-btn");
-const logoutBtn = document.getElementById("logout-btn");
+// 1. إدارة الهوية والاسم
+let myId = localStorage.getItem("chat_user_id");
+let myName = localStorage.getItem("chat_username");
+const nameModal = document.getElementById("name-modal");
 
-let currentUser = null;
+// إنشاء ID لو مش موجود
+if (!myId) {
+    myId = "user_" + Date.now() + "_" + Math.floor(Math.random() * 1000);
+    localStorage.setItem("chat_user_id", myId);
+}
 
-// 1. مراقبة حالة الدخول
-onAuthStateChanged(auth, (user) => {
-  if (user) {
-    currentUser = user;
-    loginScreen.style.display = "none";
-    chatContainer.style.display = "flex";
-  } else {
-    currentUser = null;
-    loginScreen.style.display = "flex";
-    chatContainer.style.display = "none";
-  }
+// التحكم في نافذة الاسم
+if (!myName) {
+    nameModal.style.display = "flex";
+} else {
+    nameModal.style.display = "none";
+}
+
+document.getElementById("save-name-btn").addEventListener("click", () => {
+    const nameInput = document.getElementById("username-input").value.trim();
+    if (nameInput) {
+        myName = nameInput;
+        localStorage.setItem("chat_username", myName);
+        nameModal.style.display = "none";
+    } else {
+        alert("اكتب اسم عشان نعرفك 😃");
+    }
 });
 
-// 2. زر الدخول بجوجل
-googleLoginBtn.addEventListener("click", () => {
-  signInWithPopup(auth, provider)
-    .catch((error) => {
-      console.error("Error:", error);
-      alert("حدث خطأ في الدخول!");
-    });
-});
 
-// 3. زر الخروج
-logoutBtn.addEventListener("click", () => {
-  signOut(auth);
-});
-
-// تنسيق الوقت
+// ==========================================
+// دالة تنسيق الوقت الذكية (التعديل الجديد) 🕒
+// ==========================================
 function formatTimestamp(timestamp) {
   const date = new Date(timestamp);
   const now = new Date();
+
+  // تجهيز الوقت بصيغة 12 ساعة (ص/م)
   let hours = date.getHours();
   const minutes = date.getMinutes().toString().padStart(2, "0");
   const ampm = hours >= 12 ? "م" : "ص";
   hours = hours % 12;
-  hours = hours ? hours : 12;
+  hours = hours ? hours : 12; // الساعة 0 تبقى 12
   const timeString = `${hours}:${minutes} ${ampm}`;
 
+  // مقارنة التواريخ
   const isToday = date.getDate() === now.getDate() &&
                   date.getMonth() === now.getMonth() &&
                   date.getFullYear() === now.getFullYear();
+
+  const yesterday = new Date(now);
+  yesterday.setDate(now.getDate() - 1);
+  const isYesterday = date.getDate() === yesterday.getDate() &&
+                      date.getMonth() === yesterday.getMonth() &&
+                      date.getFullYear() === yesterday.getFullYear();
+
+  // المنطق:
+  // 1. لو النهاردة -> اعرض الوقت بس
+  // 2. لو امبارح -> اكتب "أمس" + الوقت
+  // 3. لو أقدم -> اعرض التاريخ كامل
   
-  if (isToday) return timeString;
-  
-  const day = date.getDate().toString().padStart(2, "0");
-  const month = (date.getMonth() + 1).toString().padStart(2, "0");
-  return `${day}/${month} ${timeString}`;
+  if (isToday) {
+    return timeString;
+  } else if (isYesterday) {
+    return `أمس ${timeString}`;
+  } else {
+    const day = date.getDate().toString().padStart(2, "0");
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`; // التاريخ فقط للرسائل القديمة عشان الزحمة
+  }
 }
 
-// إرسال رسالة
+
+// إرسال رسالة نصية
 function sendMessage() {
   const input = document.getElementById("message-input");
   const message = input.value.trim();
-  
-  if (message && currentUser) {
+  if (message && myName) {
     push(messagesRef, { 
         text: message, 
         timestamp: Date.now(),
-        uid: currentUser.uid,
-        name: currentUser.displayName,
-        photo: currentUser.photoURL
+        senderId: myId,
+        senderName: myName
     });
     input.value = "";
   }
@@ -99,76 +111,67 @@ function sendMessage() {
 
 // إرسال صورة
 function sendImage(file) {
-  if (!file || !currentUser) return;
-  const fileRef = storageRef(storage, `images/${file.name}_${Date.now()}`);
+  if (!file || !myName) return;
+  const fileRef = storageRef(storage, `images/${file.name}`);
   uploadBytes(fileRef, file).then(snapshot => getDownloadURL(snapshot.ref))
     .then(url => {
       push(messagesRef, { 
           imageUrl: url, 
           timestamp: Date.now(), 
-          uid: currentUser.uid,
-          name: currentUser.displayName,
-          photo: currentUser.photoURL
+          senderId: myId,
+          senderName: myName 
       });
-    });
+    })
+    .catch(err => console.error("❌ خطأ:", err));
 }
 
 // استقبال وعرض الرسائل
 onChildAdded(messagesRef, snapshot => {
   const chatBox = document.getElementById("chat-box");
   const data = snapshot.val();
-  
-  const wrapper = document.createElement("div");
-  wrapper.classList.add("message-wrapper");
+  const msg = document.createElement("div");
 
-  const isMe = currentUser && data.uid === currentUser.uid;
-  if (isMe) wrapper.classList.add("sent-wrapper");
+  const isMe = data.senderId === myId;
+  const messageClass = isMe ? "sent" : "received";
+  msg.classList.add("message", messageClass);
 
-  // صورة البروفايل
-  const avatarUrl = data.photo || 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
-  const avatar = `<img src="${avatarUrl}" class="user-avatar" alt="User">`;
-
-  // محتوى الرسالة
-  const msgContent = document.createElement("div");
-  msgContent.classList.add("message", isMe ? "sent" : "received");
-
+  // استدعاء دالة الوقت الجديدة
   const timeDisplay = formatTimestamp(data.timestamp);
   
   let nameHtml = "";
-  if (!isMe) nameHtml = `<span class="sender-name">${data.name}</span>`;
+  if (!isMe) {
+      nameHtml = `<span class="sender-name">${data.senderName || "مجهول"}</span>`;
+  }
 
-  let bodyHtml = "";
   if (data.text) {
-    bodyHtml = `<p>${data.text}</p>`;
+    msg.innerHTML = `${nameHtml}<p>${data.text}<br><span class="time">${timeDisplay}</span></p>`;
   } else if (data.imageUrl) {
-    bodyHtml = `<img src="${data.imageUrl}" style="max-width:100%; border-radius:10px;">`;
+    msg.innerHTML = `${nameHtml}<img src="${data.imageUrl}" alt="صورة"><br><span class="time">${timeDisplay}</span>`;
   }
 
-  msgContent.innerHTML = `${nameHtml}${bodyHtml}<span class="time">${timeDisplay}</span>`;
-
-  // ترتيب العناصر (صورة + رسالة)
-  if (isMe) {
-      wrapper.innerHTML = `${msgContent.outerHTML} ${avatar}`;
-  } else {
-      wrapper.innerHTML = `${avatar} ${msgContent.outerHTML}`;
-  }
-
-  chatBox.appendChild(wrapper);
+  chatBox.appendChild(msg);
   chatBox.scrollTop = chatBox.scrollHeight;
 });
 
-// الأحداث
+// الأحداث والوضع الليلي
 document.addEventListener("DOMContentLoaded", () => {
   const ball = document.getElementById("ball");
   const body = document.body;
 
   if (localStorage.getItem("theme") === "dark") {
     body.classList.add("dark-mode");
+    ball.style.left = "40px";
   }
 
   ball.addEventListener("click", () => {
     body.classList.toggle("dark-mode");
-    localStorage.setItem("theme", body.classList.contains("dark-mode") ? "dark" : "light");
+    if (body.classList.contains("dark-mode")) {
+      localStorage.setItem("theme", "dark");
+      ball.style.left = "40px";
+    } else {
+      localStorage.setItem("theme", "light");
+      ball.style.left = "5px";
+    }
   });
 
   document.getElementById("send-btn").addEventListener("click", sendMessage);
