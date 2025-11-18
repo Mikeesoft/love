@@ -5,7 +5,7 @@ import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from
 
 // 1. إعدادات Firebase (بياناتك)
 const firebaseConfig = {
-  apiKey: "AIzaSyBm5C...", // ضع مفتاحك هنا
+  apiKey: "AIzaSyBm5CBE58jP10qj3-Jtfcj5KDZu90jRSbI", // ضع مفتاحك هنا
   authDomain: "love-6f927.firebaseapp.com",
   databaseURL: "https://love-6f927-default-rtdb.firebaseio.com",
   projectId: "love-6f927",
@@ -48,10 +48,32 @@ onAuthStateChanged(auth, (user) => {
 });
 
 // زر تسجيل الدخول
+// استبدل كود الزر القديم بهذا الكود للتجربة
 googleBtn.addEventListener("click", () => {
+    // تنبيه بسيط لنعرف أن الزر يعمل
+    alert("جاري الاتصال بجوجل... انتظر قليلاً ⏳");
+
     signInWithPopup(auth, provider)
-        .catch((error) => alert("فشل الدخول: " + error.message));
+        .then((result) => {
+            alert("✅ تم تسجيل الدخول بنجاح! مرحباً " + result.user.displayName);
+            // سيقوم الكود تلقائياً بتفعيل onAuthStateChanged
+        })
+        .catch((error) => {
+            // هنا سنكشف سبب المشكلة
+            console.error(error); 
+            
+            if (error.code === 'auth/unauthorized-domain') {
+                alert("🚫 خطأ: الدومين محظور!\nيجب إضافة رابط Netlify في إعدادات Firebase > Authentication > Authorized Domains");
+            } else if (error.code === 'auth/popup-closed-by-user') {
+                alert("⚠️ قمت بإغلاق النافذة قبل اكتمال التسجيل.");
+            } else if (error.code === 'auth/popup-blocked') {
+                alert("⚠️ المتصفح منع النافذة المنبثقة (Popup).\nيرجى السماح للنوافذ المنبثقة لهذا الموقع.");
+            } else {
+                alert("❌ خطأ غير معروف:\n" + error.message);
+            }
+        });
 });
+
 
 // زر دخول الغرفة
 joinRoomBtn.addEventListener("click", () => {
