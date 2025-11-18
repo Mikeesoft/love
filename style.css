@@ -1,5 +1,6 @@
-/* تصميم أسطوري لواجهة الشات */
+/* style.css - الكود الكامل */
 
+/* 1. الأساسيات والخطوط */
 * {
   margin: 0;
   padding: 0;
@@ -8,7 +9,7 @@
 }
 
 body {
-  font-family: 'Cairo', sans-serif;
+  font-family: 'Cairo', sans-serif; /* تأكد إنك ضايف رابط الخط في الـ HTML لو مش موجود */
   background: linear-gradient(to bottom right, #ffe6ea, #ffc0cb);
   color: #333;
   display: flex;
@@ -16,9 +17,10 @@ body {
   align-items: center;
   justify-content: center;
   height: 100vh;
-  overflow: hidden;
+  overflow: hidden; /* لمنع السكرول في الصفحة نفسها */
 }
 
+/* 2. حاوية الشات (Glassmorphism) */
 .chat-container {
   background: rgba(255, 255, 255, 0.2);
   backdrop-filter: blur(15px);
@@ -30,16 +32,21 @@ body {
   text-align: center;
   position: relative;
   border: 1px solid rgba(255, 255, 255, 0.3);
+  display: flex;
+  flex-direction: column;
+  height: 85vh; /* ارتفاع ثابت عشان تتناسب مع الشاشات */
 }
 
 h2 {
   color: #e84393;
-  font-size: 28px;
-  margin-bottom: 20px;
+  font-size: 24px;
+  margin-bottom: 15px;
+  flex-shrink: 0;
 }
 
+/* 3. منطقة عرض الرسائل */
 #chat-box {
-  height: 320px;
+  flex: 1; /* يأخذ باقي المساحة المتاحة */
   overflow-y: auto;
   border: 1px solid #f7c1d1;
   border-radius: 12px;
@@ -47,20 +54,25 @@ h2 {
   background: #fff5f8;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
   scrollbar-width: thin;
   scrollbar-color: #e84393 #ffe6ea;
 }
 
+/* تخصيص شريط التمرير (Scrollbar) لمتصفحات كروم */
 #chat-box::-webkit-scrollbar {
   width: 6px;
 }
-
+#chat-box::-webkit-scrollbar-track {
+  background: #ffe6ea;
+  border-radius: 4px;
+}
 #chat-box::-webkit-scrollbar-thumb {
   background-color: #e84393;
   border-radius: 4px;
 }
 
+/* 4. تصميم الرسائل */
 .message {
   max-width: 75%;
   padding: 10px 15px;
@@ -69,15 +81,18 @@ h2 {
   position: relative;
   word-wrap: break-word;
   box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  line-height: 1.5;
 }
 
+/* رسائلي (أنا) - تظهر على اليسار في وضع الـ RTL */
 .sent {
   background-color: #ffb6c1;
   color: white;
-  align-self: flex-end;
+  align-self: flex-end; 
   border-bottom-right-radius: 0;
 }
 
+/* رسائل الطرف الآخر - تظهر على اليمين في وضع الـ RTL */
 .received {
   background-color: #f1f1f1;
   color: #333;
@@ -89,85 +104,115 @@ h2 {
   max-width: 100%;
   border-radius: 10px;
   margin-top: 5px;
+  display: block;
 }
 
 .time {
-  font-size: 11px;
-  color: #666;
+  font-size: 10px;
   display: block;
-  margin-top: 6px;
-  text-align: right;
+  margin-top: 5px;
+  opacity: 0.8;
+  text-align: left;
 }
 
+/* 5. منطقة الكتابة والأزرار */
 .input-area {
   display: flex;
   align-items: center;
   margin-top: 15px;
-  gap: 10px;
+  gap: 8px;
+  flex-shrink: 0;
+  width: 100%;
 }
 
 input[type="text"] {
-  flex: 1;
-  padding: 10px 15px;
-  border-radius: 20px;
+  flex: 1; /* يأخذ أكبر مساحة ممكنة */
+  padding: 12px 15px;
+  border-radius: 25px;
   border: 1px solid #ddd;
   outline: none;
   font-size: 15px;
   background-color: white;
 }
 
+/* أزرار الإرسال والمرفقات */
 #send-btn, #file-input-label {
   background-color: #e84393;
   color: white;
   border: none;
-  border-radius: 20px;
-  padding: 10px 18px;
+  border-radius: 50%; /* شكل دائري للأيقونات لو حبيت، أو 20px للمستطيل */
+  width: 45px;
+  height: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
-  font-size: 15px;
+  font-size: 18px;
+  flex-shrink: 0; /* ممنوع ينكمشوا */
+  transition: transform 0.2s;
+}
+
+#send-btn {
+  border-radius: 20px; /* نرجعه مستطيل بحواف دائرية لكلمة "إرسال" */
+  width: auto;
+  padding: 0 20px;
+}
+
+#send-btn:hover, #file-input-label:hover {
+  transform: scale(1.05);
+  background-color: #d63080;
 }
 
 #file-input {
   display: none;
 }
 
-#file-input-label {
-  display: inline-block;
-}
-
+/* 6. زر الوضع الليلي (الكرة) */
 #ball {
   width: 25px;
   height: 25px;
   background-color: #fff;
   border-radius: 50%;
   position: absolute;
-  top: 10px;
-  left: 5px;
+  top: 15px;
+  left: 15px;
   cursor: pointer;
   box-shadow: 0 0 6px rgba(0, 0, 0, 0.2);
-  transition: left 0.3s;
+  transition: left 0.3s, background 0.3s;
+  z-index: 10;
 }
 
+/* 7. الوضع الليلي (Dark Mode) */
 .dark-mode {
-  background: linear-gradient(to bottom right, #222, #555);
+  background: linear-gradient(to bottom right, #222, #444);
   color: #eee;
 }
 
 .dark-mode .chat-container {
-  background: rgba(0, 0, 0, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.dark-mode h2 {
+  color: #ff80ab;
 }
 
 .dark-mode #chat-box {
-  background: #2e2e2e;
+  background: #252525;
   border-color: #444;
+  scrollbar-color: #d6336c #333;
+}
+
+.dark-mode #chat-box::-webkit-scrollbar-track {
+  background: #333;
 }
 
 .dark-mode .sent {
-  background-color: #d6336c;
+  background-color: #c2185b; /* لون أغمق شوية في الوضع الليلي */
 }
 
 .dark-mode .received {
-  background-color: #444;
+  background-color: #3a3a3a;
   color: #eee;
 }
 
@@ -179,59 +224,41 @@ input[type="text"] {
 
 .dark-mode #send-btn,
 .dark-mode #file-input-label {
-  background-color: #d6336c;
+  background-color: #c2185b;
 }
 
-/* تجاوُب الموقع مع جميع الشاشات */
+/* 8. التجاوب مع الشاشات الصغيرة (الموبايل) */
 @media (max-width: 768px) {
   .chat-container {
-    width: 95%;
-    padding: 20px;
-    border-radius: 15px;
-  }
-
-  #chat-box {
-    height: 300px;
-  }
-
-  .input-area {
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  #message-input {
     width: 100%;
-    font-size: 16px;
-  }
-
-  #send-btn {
-    width: 100%;
-    font-size: 16px;
-  }
-
-  #file-input-label {
-    font-size: 18px;
-  }
-}
-
-@media (max-width: 480px) {
-  h2 {
-    font-size: 22px;
-  }
-
-  .chat-container {
+    height: 100%; /* ملء الشاشة في الموبايل */
+    border-radius: 0; /* إلغاء الحواف الدائرية الخارجية */
     padding: 15px;
   }
 
-  #chat-box {
-    height: 260px;
+  h2 {
+    font-size: 20px;
+    margin-top: 20px; /* مسافة عشان زرار الوضع الليلي */
   }
 
   #send-btn {
-    padding: 10px;
+    font-size: 14px;
+    padding: 0 15px;
+    height: 40px;
+  }
+  
+  #file-input-label {
+    width: 40px;
+    height: 40px;
   }
 
-  #message-input {
+  input[type="text"] {
     padding: 10px;
+    height: 40px;
+  }
+  
+  /* أهم جزء: التأكد إن العناصر جنب بعض */
+  .input-area {
+    flex-direction: row; 
   }
 }
