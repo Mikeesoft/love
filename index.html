@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="theme-color" content="#ffffff">
-  <title>شات وردي أسطوري</title>
+  <meta name="theme-color" content="#e91e63">
+  <title>شات أسطوري</title>
   <link rel="stylesheet" href="style.css">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <script type="module" src="script.js" defer></script>
@@ -15,16 +15,17 @@
     <div class="login-card">
       <h3>مرحباً بك! 👋</h3>
       <p>اختر اسماً مستعاراً للدخول</p>
-      <input type="text" id="username-input" placeholder="اكتب اسمك هنا..." autocomplete="off">
+      <input type="text" id="username-input" placeholder="اكتب اسمك هنا..." autocomplete="off" maxlength="15">
       <button id="join-btn">دخول للشات</button>
     </div>
   </div>
 
   <div class="chat-container">
+    
     <header class="chat-header">
       <div class="header-info">
-        <h2>غرفة الشات الوردية 🌸</h2>
-        <span class="status">متصل الآن</span>
+        <h2>غرفة الشات العامة</h2>
+        <div class="typing-status"></div>
       </div>
       <button id="theme-toggle" class="icon-btn">🌙</button>
     </header>
@@ -32,10 +33,12 @@
     <div id="chat-box"></div>
 
     <div class="input-area">
-      <label for="file-input" class="attach-btn"><span class="material-icons">attach_file</span></label>
+      <label for="file-input" class="attach-btn">
+        <span class="material-icons">attach_file</span>
+      </label>
       <input type="file" id="file-input" accept="image/*" hidden>
       
-      <input type="text" id="message-input" placeholder="رسالة..." autocomplete="off">
+      <input type="text" id="message-input" placeholder="اكتب رسالة..." autocomplete="off" enterkeyhint="send">
       
       <button id="send-btn" class="send-btn">
         <span class="material-icons">send</span>
