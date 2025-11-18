@@ -1,18 +1,16 @@
-// Firebase - تهيئة
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
 import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-database.js";
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-storage.js";
 
-// إعداد Firebase
+// ⚠️ ضع إعداداتك هنا مرة أخرى
 const firebaseConfig = {
-  apiKey: "AIzaSyBm5C...",
+  apiKey: "AIzaSyBm5C...", // تأكد من وضع مفتاحك
   authDomain: "love-6f927.firebaseapp.com",
   databaseURL: "https://love-6f927-default-rtdb.firebaseio.com",
   projectId: "love-6f927",
   storageBucket: "love-6f927.appspot.com",
   messagingSenderId: "986690537911",
-  appId: "1:986690537911:web:4d5f980f39090249250032",
-  measurementId: "G-FVMS8SEGGF"
+  appId: "1:986690537911:web:4d5f980f39090249250032"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -20,87 +18,116 @@ const db = getDatabase(app);
 const storage = getStorage(app);
 const messagesRef = ref(db, "messages");
 
-// تحويل الوقت لصيغة واضحة
-function formatTimestamp(timestamp) {
-  const date = new Date(timestamp);
-  const hours = date.getHours().toString().padStart(2, "0");
-  const minutes = date.getMinutes().toString().padStart(2, "0");
-  const day = date.getDate().toString().padStart(2, "0");
-  const month = (date.getMonth() + 1).toString().padStart(2, "0");
-  const year = date.getFullYear();
-  return `${hours}:${minutes} - ${day}/${month}/${year}`;
+// --- إدارة المستخدم ---
+let currentUser = localStorage.getItem("chat_username") || "";
+let userId = localStorage.getItem("chat_user_id");
+
+if (!userId) {
+  userId = "uid_" + Date.now();
+  localStorage.setItem("chat_user_id", userId);
 }
 
-// إرسال رسالة نصية
+// التحقق من الدخول
+const loginScreen = document.getElementById("login-screen");
+const joinBtn = document.getElementById("join-btn");
+const usernameInput = document.getElementById("username-input");
+
+if (currentUser) {
+  loginScreen.style.display = "none"; // المستخدم مسجل سابقاً
+}
+
+joinBtn.addEventListener("click", () => {
+  const name = usernameInput.value.trim();
+  if (name) {
+    currentUser = name;
+    localStorage.setItem("chat_username", name);
+    loginScreen.style.display = "none";
+  }
+});
+
+// --- الدوال ---
+function formatTime(timestamp) {
+  return new Date(timestamp).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+}
+
 function sendMessage() {
   const input = document.getElementById("message-input");
-  const message = input.value.trim();
-  if (message) {
-    push(messagesRef, { text: message, timestamp: Date.now() });
+  const text = input.value.trim();
+  if (text && currentUser) {
+    push(messagesRef, {
+      senderId: userId,
+      senderName: currentUser, // نرسل الاسم الآن
+      text: text,
+      type: "text",
+      timestamp: Date.now()
+    });
     input.value = "";
   }
 }
 
-// إرسال صورة
 function sendImage(file) {
-  if (!file) return;
-  const fileRef = storageRef(storage, `images/${file.name}`);
-  uploadBytes(fileRef, file).then(snapshot => getDownloadURL(snapshot.ref))
-    .then(url => {
-      push(messagesRef, { imageUrl: url, timestamp: Date.now() });
-    })
-    .catch(err => console.error("❌ خطأ في تحميل الصورة:", err));
+  if (!file || !currentUser) return;
+  const uniqueName = Date.now() + '-' + file.name;
+  const fileRef = storageRef(storage, `images/${uniqueName}`);
+  
+  uploadBytes(fileRef, file).then(snap => getDownloadURL(snap.ref)).then(url => {
+    push(messagesRef, {
+      senderId: userId,
+      senderName: currentUser,
+      imageUrl: url,
+      type: "image",
+      timestamp: Date.now()
+    });
+  });
 }
 
-// استقبال الرسائل
+// --- عرض الرسائل ---
 onChildAdded(messagesRef, snapshot => {
-  const chatBox = document.getElementById("chat-box");
   const data = snapshot.val();
-  const msg = document.createElement("div");
+  const chatBox = document.getElementById("chat-box");
+  
+  const msgDiv = document.createElement("div");
+  msgDiv.classList.add("message");
+  
+  // تحديد الكلاس (مرسل أم مستقبل)
+  const isMe = data.senderId === userId;
+  msgDiv.classList.add(isMe ? "sent" : "received");
 
-  const messageClass = data.sender === "me" ? "sent" : "received";
-  msg.classList.add("message", messageClass);
-
-  const time = formatTimestamp(data.timestamp);
-
-  if (data.text) {
-    msg.innerHTML = `<p>${data.text}<br><span class="time">${time}</span></p>`;
-  } else if (data.imageUrl) {
-    msg.innerHTML = `<img src="${data.imageUrl}" alt="📷 صورة"><br><span class="time">${time}</span>`;
+  const time = formatTime(data.timestamp);
+  
+  // بناء محتوى الرسالة (اسم المرسل يظهر فقط للآخرين)
+  let htmlContent = "";
+  if (!isMe) {
+    htmlContent += `<span class="sender-name">${data.senderName}</span>`;
   }
 
-  chatBox.appendChild(msg);
-  chatBox.scrollTop = chatBox.scrollHeight;
+  if (data.type === "text") {
+    htmlContent += `${data.text}`;
+  } else if (data.type === "image") {
+    htmlContent += `<img src="${data.imageUrl}" style="max-width:100%; border-radius:10px;">`;
+  }
+
+  htmlContent += `<span class="time">${time}</span>`;
+  msgDiv.innerHTML = htmlContent;
+
+  chatBox.appendChild(msgDiv);
+  chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: "smooth" });
 });
 
-// الوضع الليلي
+// --- تهيئة الأحداث ---
 document.addEventListener("DOMContentLoaded", () => {
-  const ball = document.getElementById("ball");
-  const body = document.body;
-
-  // حفظ واسترجاع الوضع من التخزين المحلي
-  if (localStorage.getItem("theme") === "dark") {
-    body.classList.add("dark-mode");
-    ball.style.left = "40px";
-  }
-
-  ball.addEventListener("click", () => {
-    body.classList.toggle("dark-mode");
-    if (body.classList.contains("dark-mode")) {
-      localStorage.setItem("theme", "dark");
-      ball.style.left = "40px";
-    } else {
-      localStorage.setItem("theme", "light");
-      ball.style.left = "5px";
-    }
-  });
-
-  // التعامل مع الرسائل
   document.getElementById("send-btn").addEventListener("click", sendMessage);
-  document.getElementById("message-input").addEventListener("keypress", e => {
-    if (e.key === "Enter") sendMessage();
-  });
-  document.getElementById("file-input").addEventListener("change", e => {
-    sendImage(e.target.files[0]);
+  document.getElementById("message-input").addEventListener("keypress", e => { if(e.key==="Enter") sendMessage() });
+  
+  const fileInp = document.getElementById("file-input");
+  fileInp.addEventListener("change", () => sendImage(fileInp.files[0]));
+
+  // الوضع الليلي
+  const btn = document.getElementById("theme-toggle");
+  if(localStorage.getItem("theme")==="dark") document.body.classList.add("dark-mode");
+  
+  btn.addEventListener("click", () => {
+    document.body.classList.toggle("dark-mode");
+    localStorage.setItem("theme", document.body.classList.contains("dark-mode") ? "dark" : "light");
   });
 });
