@@ -5,7 +5,7 @@ import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "http
 
 // إعداد Firebase
 const firebaseConfig = {
-    apiKey: "AIzaSyBm5C...",
+    apiKey: "AIzaSyBm5CBE58jP10qj3-Jtfcj5KDZu90jRSbI",
     authDomain: "love-6f927.firebaseapp.com",
     databaseURL: "https://love-6f927-default-rtdb.firebaseio.com",
     projectId: "love-6f927",
