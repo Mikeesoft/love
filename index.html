@@ -3,50 +3,34 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>شات سري ومحمي 🔒</title>
-  
+  <title>شات وردي أسطوري</title>
   <link rel="stylesheet" href="style.css">
-  
   <script type="module" src="script.js"></script>
 </head>
 <body>
 
-  <div id="login-modal" class="modal-overlay">
+  <div id="name-modal" class="modal-overlay">
     <div class="modal-content">
-      <h3>🔐 منطقة محمية</h3>
-      <p>لضمان الخصوصية، يرجى تسجيل الدخول أولاً</p>
-      
-      <button id="google-login-btn">
-        <span style="font-size:18px;">🇬</span> تسجيل الدخول بحساب Google
-      </button>
-
-      <div id="room-section" style="display: none; margin-top: 15px; border-top: 1px solid #eee; padding-top: 15px;">
-        <p style="color:#666; font-size:14px; margin-bottom:5px;">أدخل كود الغرفة السري للاتصال بصديقك:</p>
-        <input type="text" id="room-input" placeholder="Secret-Code-123" autocomplete="off">
-        <button id="join-room-btn">🚀 دخول الغرفة</button>
-      </div>
+      <h3>أدخل اسمك يا بطل 🌸</h3>
+      <input type="text" id="username-input" placeholder="اسمك هنا..." maxlength="15">
+      <button id="save-name-btn">دخول الشات</button>
     </div>
   </div>
 
   <div class="chat-container">
-    
-    <div id="ball" title="تبديل الوضع"></div>
+    <div id="ball" title="تبديل الوضع الليلي"></div>
 
-    <h2>غرفة محادثة خاصة 🤫</h2>
+    <h2>غرفة الشات الوردية</h2>
 
-    <div id="chat-box">
-      </div>
+    <div id="chat-box"></div>
 
     <div class="input-area">
-      <input type="text" id="message-input" placeholder="اكتب رسالة مشفرة..." autocomplete="off">
-      
-      <label for="file-input" id="file-input-label" title="إرسال صورة">📎</label>
+      <input type="text" id="message-input" placeholder="اكتب رسالتك هنا...">
+      <label for="file-input" id="file-input-label">📎</label>
       <input type="file" id="file-input" accept="image/*">
-      
-      <button id="send-btn" title="إرسال">➤</button>
+      <button id="send-btn">إرسال</button>
     </div>
-
   </div>
 
 </body>
-</html>
+</html> 

@@ -1,210 +1,184 @@
+// Firebase - تهيئة
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
-import { getDatabase, ref, push, onChildAdded, off } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-database.js";
+import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-database.js";
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-storage.js";
-import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js";
 
-// 1. إعدادات Firebase (بياناتك)
+// إعداد Firebase
 const firebaseConfig = {
-  apiKey: "AIzaSyBm5CBE58jP10qj3-Jtfcj5KDZu90jRSbI", // ضع مفتاحك هنا
-  authDomain: "love-6f927.firebaseapp.com",
-  databaseURL: "https://love-6f927-default-rtdb.firebaseio.com",
-  projectId: "love-6f927",
-  storageBucket: "love-6f927.appspot.com",
-  messagingSenderId: "986690537911",
-  appId: "1:986690537911:web:4d5f980f39090249250032"
+    apiKey: "AIzaSyBm5C...",
+    authDomain: "love-6f927.firebaseapp.com",
+    databaseURL: "https://love-6f927-default-rtdb.firebaseio.com",
+    projectId: "love-6f927",
+    storageBucket: "love-6f927.appspot.com",
+    messagingSenderId: "986690537911",
+    appId: "1:986690537911:web:4d5f980f39090249250032",
+    measurementId: "G-FVMS8SEGGF"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const storage = getStorage(app);
-const auth = getAuth(app);
-const provider = new GoogleAuthProvider();
+const messagesRef = ref(db, "messages");
 
-// المتغيرات العامة
-let currentUser = null;
-let currentRoom = null;
-let messagesRef = null;
+// 1. إدارة الهوية والاسم
+let myId = localStorage.getItem("chat_user_id");
+let myName = localStorage.getItem("chat_username");
+const nameModal = document.getElementById("name-modal");
 
-// عناصر الواجهة
-const loginModal = document.getElementById("login-modal");
-const googleBtn = document.getElementById("google-login-btn");
-const roomSection = document.getElementById("room-section");
-const roomInput = document.getElementById("room-input");
-const joinRoomBtn = document.getElementById("join-room-btn");
-const chatBox = document.getElementById("chat-box");
-
-// ==========================================
-// 2. نظام الحماية وتسجيل الدخول
-// ==========================================
-
-// مراقبة حالة المستخدم (هل سجل دخوله أم لا؟)
-onAuthStateChanged(auth, (user) => {
-    if (user) {
-        currentUser = user;
-        googleBtn.style.display = "none"; // إخفاء زر الدخول
-        roomSection.style.display = "block"; // إظهار خانة الغرفة
-        console.log("تم التعرف على المستخدم:", user.displayName);
-    }
-});
-
-// زر تسجيل الدخول
-// استبدل كود الزر القديم بهذا الكود للتجربة
-googleBtn.addEventListener("click", () => {
-    // تنبيه بسيط لنعرف أن الزر يعمل
-    alert("جاري الاتصال بجوجل... انتظر قليلاً ⏳");
-
-    signInWithPopup(auth, provider)
-        .then((result) => {
-            alert("✅ تم تسجيل الدخول بنجاح! مرحباً " + result.user.displayName);
-            // سيقوم الكود تلقائياً بتفعيل onAuthStateChanged
-        })
-        .catch((error) => {
-            // هنا سنكشف سبب المشكلة
-            console.error(error); 
-            
-            if (error.code === 'auth/unauthorized-domain') {
-                alert("🚫 خطأ: الدومين محظور!\nيجب إضافة رابط Netlify في إعدادات Firebase > Authentication > Authorized Domains");
-            } else if (error.code === 'auth/popup-closed-by-user') {
-                alert("⚠️ قمت بإغلاق النافذة قبل اكتمال التسجيل.");
-            } else if (error.code === 'auth/popup-blocked') {
-                alert("⚠️ المتصفح منع النافذة المنبثقة (Popup).\nيرجى السماح للنوافذ المنبثقة لهذا الموقع.");
-            } else {
-                alert("❌ خطأ غير معروف:\n" + error.message);
-            }
-        });
-});
-
-
-// زر دخول الغرفة
-joinRoomBtn.addEventListener("click", () => {
-    const roomCode = roomInput.value.trim();
-    if (roomCode.length < 5) {
-        alert("⚠️ كود الغرفة يجب أن يكون 5 أحرف/أرقام على الأقل ليكون صعب الاختراق!");
-        return;
-    }
-    
-    enterRoom(roomCode);
-});
-
-// دالة دخول الغرفة وتشغيل الشات
-function enterRoom(roomId) {
-    currentRoom = roomId;
-    loginModal.style.display = "none";
-    
-    // تغيير مسار قاعدة البيانات ليكون خاصاً بالغرفة فقط
-    // المسار يصبح: rooms/SECRET_CODE/messages
-    messagesRef = ref(db, `rooms/${roomId}/messages`);
-
-    // تنظيف الشات القديم (في حال التبديل)
-    chatBox.innerHTML = "";
-    
-    // بدء استقبال الرسائل
-    listenForMessages();
-    
-    alert(`🔒 تم تشفير المحادثة في الغرفة: ${roomId}`);
+// إنشاء ID لو مش موجود
+if (!myId) {
+    myId = "user_" + Date.now() + "_" + Math.floor(Math.random() * 1000);
+    localStorage.setItem("chat_user_id", myId);
 }
 
-// ==========================================
-// 3. الوظائف الأساسية (إرسال واستقبال)
-// ==========================================
+// التحكم في نافذة الاسم
+if (!myName) {
+    nameModal.style.display = "flex";
+} else {
+    nameModal.style.display = "none";
+}
 
+document.getElementById("save-name-btn").addEventListener("click", () => {
+    const nameInput = document.getElementById("username-input").value.trim();
+    if (nameInput) {
+        myName = nameInput;
+        localStorage.setItem("chat_username", myName);
+        nameModal.style.display = "none";
+    } else {
+        alert("اكتب اسم عشان نعرفك 😃");
+    }
+});
+
+
+// ==========================================
+// دالة تنسيق الوقت الذكية (التعديل الجديد) 🕒
+// ==========================================
 function formatTimestamp(timestamp) {
     const date = new Date(timestamp);
-    return date.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+    const now = new Date();
+    
+    // تجهيز الوقت بصيغة 12 ساعة (ص/م)
+    let hours = date.getHours();
+    const minutes = date.getMinutes().toString().padStart(2, "0");
+    const ampm = hours >= 12 ? "م" : "ص";
+    hours = hours % 12;
+    hours = hours ? hours : 12; // الساعة 0 تبقى 12
+    const timeString = `${hours}:${minutes} ${ampm}`;
+    
+    // مقارنة التواريخ
+    const isToday = date.getDate() === now.getDate() &&
+        date.getMonth() === now.getMonth() &&
+        date.getFullYear() === now.getFullYear();
+    
+    const yesterday = new Date(now);
+    yesterday.setDate(now.getDate() - 1);
+    const isYesterday = date.getDate() === yesterday.getDate() &&
+        date.getMonth() === yesterday.getMonth() &&
+        date.getFullYear() === yesterday.getFullYear();
+    
+    // المنطق:
+    // 1. لو النهاردة -> اعرض الوقت بس
+    // 2. لو امبارح -> اكتب "أمس" + الوقت
+    // 3. لو أقدم -> اعرض التاريخ كامل
+    
+    if (isToday) {
+        return timeString;
+    } else if (isYesterday) {
+        return `أمس ${timeString}`;
+    } else {
+        const day = date.getDate().toString().padStart(2, "0");
+        const month = (date.getMonth() + 1).toString().padStart(2, "0");
+        const year = date.getFullYear();
+        return `${day}/${month}/${year}`; // التاريخ فقط للرسائل القديمة عشان الزحمة
+    }
 }
 
-// إرسال نص
+
+// إرسال رسالة نصية
 function sendMessage() {
     const input = document.getElementById("message-input");
-    const text = input.value.trim();
-    
-    if (text && currentUser && messagesRef) {
+    const message = input.value.trim();
+    if (message && myName) {
         push(messagesRef, {
-            text: text,
-            senderId: currentUser.uid, // المعرف السري للمستخدم
-            senderName: currentUser.displayName,
-            photo: currentUser.photoURL,
+            text: message,
             timestamp: Date.now(),
-            type: 'text'
+            senderId: myId,
+            senderName: myName
         });
         input.value = "";
     }
 }
 
 // إرسال صورة
-window.sendImage = function(file) { // جعلناها global لتعمل مع HTML
-    if (!file || !currentUser || !messagesRef) return;
-
-    const uniqueName = `${currentRoom}_${Date.now()}_${file.name}`;
-    const fileRef = storageRef(storage, `private_images/${uniqueName}`);
-
+function sendImage(file) {
+    if (!file || !myName) return;
+    const fileRef = storageRef(storage, `images/${file.name}`);
     uploadBytes(fileRef, file).then(snapshot => getDownloadURL(snapshot.ref))
         .then(url => {
             push(messagesRef, {
                 imageUrl: url,
-                senderId: currentUser.uid,
-                senderName: currentUser.displayName,
-                photo: currentUser.photoURL,
                 timestamp: Date.now(),
-                type: 'image'
+                senderId: myId,
+                senderName: myName
             });
         })
-        .catch(err => console.error("خطأ رفع الصورة:", err));
-};
-
-// استقبال الرسائل
-function listenForMessages() {
-    onChildAdded(messagesRef, snapshot => {
-        const data = snapshot.val();
-        const msgDiv = document.createElement("div");
-        const isMe = data.senderId === currentUser.uid;
-
-        msgDiv.classList.add("message");
-        msgDiv.classList.add(isMe ? "sent" : "received");
-
-        let content = "";
-        
-        // عرض الاسم والصورة للطرف الآخر فقط
-        if (!isMe) {
-            content += `<div class="sender-info" style="display:flex; align-items:center; gap:5px; margin-bottom:5px;">
-                        <img src="${data.photo}" style="width:20px; height:20px; border-radius:50%;">
-                        <span class="sender-name">${data.senderName}</span>
-                       </div>`;
-        }
-
-        if (data.type === 'image') {
-            content += `<img src="${data.imageUrl}" style="cursor:pointer;" onclick="window.open(this.src)">`;
-        } else {
-            content += `<p>${data.text}</p>`;
-        }
-
-        content += `<span class="time">${formatTimestamp(data.timestamp)}</span>`;
-        
-        msgDiv.innerHTML = content;
-        chatBox.appendChild(msgDiv);
-        chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: 'smooth' });
-    });
+        .catch(err => console.error("❌ خطأ:", err));
 }
 
-// ==========================================
-// 4. الأحداث
-// ==========================================
-document.addEventListener("DOMContentLoaded", () => {
-    document.getElementById("send-btn").addEventListener("click", sendMessage);
+// استقبال وعرض الرسائل
+onChildAdded(messagesRef, snapshot => {
+    const chatBox = document.getElementById("chat-box");
+    const data = snapshot.val();
+    const msg = document.createElement("div");
     
+    const isMe = data.senderId === myId;
+    const messageClass = isMe ? "sent" : "received";
+    msg.classList.add("message", messageClass);
+    
+    // استدعاء دالة الوقت الجديدة
+    const timeDisplay = formatTimestamp(data.timestamp);
+    
+    let nameHtml = "";
+    if (!isMe) {
+        nameHtml = `<span class="sender-name">${data.senderName || "مجهول"}</span>`;
+    }
+    
+    if (data.text) {
+        msg.innerHTML = `${nameHtml}<p>${data.text}<br><span class="time">${timeDisplay}</span></p>`;
+    } else if (data.imageUrl) {
+        msg.innerHTML = `${nameHtml}<img src="${data.imageUrl}" alt="صورة"><br><span class="time">${timeDisplay}</span>`;
+    }
+    
+    chatBox.appendChild(msg);
+    chatBox.scrollTop = chatBox.scrollHeight;
+});
+
+// الأحداث والوضع الليلي
+document.addEventListener("DOMContentLoaded", () => {
+    const ball = document.getElementById("ball");
+    const body = document.body;
+    
+    if (localStorage.getItem("theme") === "dark") {
+        body.classList.add("dark-mode");
+        ball.style.left = "40px";
+    }
+    
+    ball.addEventListener("click", () => {
+        body.classList.toggle("dark-mode");
+        if (body.classList.contains("dark-mode")) {
+            localStorage.setItem("theme", "dark");
+            ball.style.left = "40px";
+        } else {
+            localStorage.setItem("theme", "light");
+            ball.style.left = "5px";
+        }
+    });
+    
+    document.getElementById("send-btn").addEventListener("click", sendMessage);
     document.getElementById("message-input").addEventListener("keypress", e => {
         if (e.key === "Enter") sendMessage();
     });
-
     document.getElementById("file-input").addEventListener("change", e => {
-        if(e.target.files.length > 0) window.sendImage(e.target.files[0]);
+        sendImage(e.target.files[0]);
     });
-
-    // الوضع الليلي (نفس الكود السابق)
-    const ball = document.getElementById("ball");
-    if(ball) {
-        ball.addEventListener("click", () => {
-            document.body.classList.toggle("dark-mode");
-        });
-    }
 });
